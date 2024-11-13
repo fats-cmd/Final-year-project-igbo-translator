@@ -1,0 +1,154 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'robuto', sans-serif;
+    text-decoration: none;
+}
+body{
+    height: 100vh;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.container{
+    width: 900px;
+    background: #fff;
+    box-shadow: 0 2px 28px rgba(0, 0, 0, .3);
+    border-radius: 5px;
+    overflow: hidden;
+
+}
+.translator-property{
+    border: 1px solid #c7c7c783
+}
+
+.translator-property .nuv-item{
+    display: flex;
+    width: 100%;
+    height: 50px;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none;
+    border-bottom: 1px solid #c7c7c7;
+    padding: 0 20px;
+
+}
+
+.translator-property .nuv-item li select{
+    outline: none;
+    border-style: none;
+    padding: 10px 20px;
+    font-size: 17px;
+    font-weight: 500;
+    color: #606060;
+    cursor: pointer;
+    transition: all .3s ease-out;
+ 
+}
+
+.translator-property .nuv-item li select:hover{
+    color: #111;
+
+}
+
+.bx-transfer{
+    font-size: 22px;
+    color: #606060;
+    cursor: pointer;
+    transition: all .3s ease-out;
+
+}
+
+.bx-transfer:hover{
+    color: #111;
+
+}
+
+.write-box{
+    display: flex;
+
+}
+.property-from, .property-trans{
+    width: 100%;
+
+}
+
+.write-box textarea{
+    width: 100%;
+    height: 250px;
+    border-style: none;
+    outline: none;
+    resize: none;
+    padding: 10px 20px;
+    font-size: 20px;
+    color: #606060;
+    position: relative;
+
+}
+
+.write-box textarea:nth-child(1){
+    border-right: 1px solid #c7c7c7;
+}
+
+.write-box .icons{
+    position: relative;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px; 
+}
+
+.icons .bx{
+    width: 35px;
+    height: 35px;
+    background: #f0f0f0;
+    text-align: center;
+    line-height: 35px;
+    font-size: 18px;
+    color: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all .3s ease-out;
+
+}
+
+.icons .bx:hover{
+    background: #606060;
+    color: wheat;
+}
+.code-lenght{
+    font-size: 18px;
+    color: #606060;
+}
+
+.submit-button{
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    background: #606060;
+    width: 160px;
+    padding: 15px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: none;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    -webkit-transition-property: box-shadow, transform;
+    transition-property: box-shadow, transform;
+
+}
+
+.submit-button:hover, .btn:focus, .btn:active{
+    color: wheat;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+}

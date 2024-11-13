@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <title>Neural Machine Translator</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/styles.css">
+
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navdiv">
+        <div class="logo"><img src="./logo-wide.png" alt="Unical logo"> Neural language Translator</div>
+        <ul>
+            <button>Login</button>
+        </ul>
+        </div>
+      </nav>
+
+    <div class="container">
+        <div class="translator-property">
+            <ul class="nuv-item">
+                <li>
+                    <select>
+                        <option value="en-ig">English</option>
+                    </select>
+                </li>
+                <li class="bx bx-transfer"></li>
+                <li>
+                    <select>
+                        <option value="ig-en">Igbo</option>
+                    </select>
+                </li>
+            </ul>
+            
+            <form action="/index" class="write-box" method="post"> 
+                <div class="property-from">
+                    <textarea name="untranslated" maxlength="2000" class="fromText" placeholder="Enter Text"></textarea>
+                    <div class="icons">
+                        <span class="bx bx-copy"></span>
+                        <div class="code-length"></div>
+                    </div>
+                    </div>
+               
+                <div class="property-trans">
+                    <textarea name="the-translated" class="toTranslate" placeholder="Translated Text">{{ the_translated }}</textarea>
+                    <div class="icons">
+                        <span class="bx bx-copy"></span>
+                    </div>
+                    
+                    <div>
+                    <button type="submit" class="submit-button">Translate</button>
+                    </div>
+                 
+                </div>
+            </form>
+
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

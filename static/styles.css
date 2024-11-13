@@ -1,0 +1,37 @@
+/* This is for the Navigation bar */
+*{
+    text-decoration: none;
+}
+
+
+.navbar{
+    position: relative;
+    z-index: 1;
+    box-sizing: content-box;
+    white-space: nowrap;
+    background: #606060;
+    font-family: 'robuto', sans-serif;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+.navdiv{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo{
+    font-size: 35px;
+    font-weight: 600;
+    color: #f0f0f0;
+
+}
+
+.logo img{
+    width: 45px;
+}
+
+button{
+    list-style-type: none;
+    display: inline-block;
+}
