@@ -9,60 +9,244 @@
     <title>Neural Machine Translator</title>
     <link rel="stylesheet" href="static/style.css">
     <link rel="stylesheet" href="static/styles.css">
+    <style>
+        .switch-btn {
+            background: #e0e0e0;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background 0.2s;
+        }
+        .switch-btn:hover {
+            background: #606060;
+            color: #fff;
+        }
+        .copied {
+            color: green;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+    </style>
 
 </head>
 <body>
-<!-- 
-    <nav class="navbar">
-        <div class="navdiv">
-        <div class="logo"><img src="./logo-wide.png" alt="Unical logo"> Neural language Translator</div>
-        <ul>
-            <button>Login</button>
-        </ul>
-        </div>
-      </nav> -->
-
+    <button id="darkModeToggle" style="position:fixed;top:10px;right:10px;z-index:1000;">🌙</button>
     <div class="container">
         <div class="translator-property">
-            <ul class="nuv-item">
+            <ul class="nav-item">
                 <li>
-                    <select>
-                        <option value="en-ig">English</option>
+                    <select id="fromLang">
+                        <option value="en" {% if request.form.get('from_lang','en')=='en' %}selected{% endif %}>English</option>
+                        <option value="ig" {% if request.form.get('from_lang')=='ig' %}selected{% endif %}>Igbo</option>
                     </select>
                 </li>
-                <li class="bx bx-transfer"></li>
+                <button type="button" class="switch-btn" id="switchLangBtn" title="Switch Languages">
+                    <i class="bx bx-transfer"></i>
+                </button>
                 <li>
-                    <select>
-                        <option value="ig-en">Igbo</option>
+                    <select id="toLang">
+                        <option value="ig" {% if request.form.get('to_lang','ig')=='ig' %}selected{% endif %}>Igbo</option>
+                        <option value="en" {% if request.form.get('to_lang')=='en' %}selected{% endif %}>English</option>
                     </select>
                 </li>
             </ul>
-            
-            <form action="/index" class="write-box" method="post"> 
+            {% if error %}
+            <div style="color:red;text-align:center;margin:10px 0;">{{ error }}</div>
+            {% endif %}
+            <form action="/index" class="write-box" method="post" id="translateForm"> 
+                <!-- left hand side  -->
                 <div class="property-from">
-                    <textarea name="untranslated" maxlength="2000" class="fromText" placeholder="Enter Text">{{untranslated}}</textarea>
+                    <textarea name="untranslated" maxlength="2000" class="fromText" id="fromText" placeholder="Enter Text">{{untranslated}}</textarea>
                     <div class="icons">
-                        <span class="bx bx-copy"></span>
-                        <div class="code-length"></div>
+                        <span class="bx bx-microphone" id="speechFrom" title="Speak"></span>
+                        <span class="bx bx-copy" id="copyFrom" title="Copy"></span>
+                        <span class="copied" id="copiedFrom" style="display:none;">Copied!</span>
+                        <div class="code-length" id="fromLength"></div>
                     </div>
-                    </div>
-               
+                </div>
+                <!-- right hand side  -->
                 <div class="property-trans">
-                    <textarea name="the-translated" class="toTranslate" placeholder="Translated Text">{{ the_translated }}</textarea>
+                    <textarea name="the-translated" class="toTranslate" id="toText" placeholder="Translated Text" readonly>{{ the_translated }}</textarea>
                     <div class="icons">
-                        <span class="bx bx-copy"></span>
+                        <span class="bx bx-volume-full" id="ttsTo" title="Listen"></span>
+                        <span class="bx bx-copy" id="copyTo" title="Copy"></span>
+                        <span class="copied" id="copiedTo" style="display:none;">Copied!</span>
+                        <span class="bx bx-download" id="downloadTo" title="Download"></span>
+                        <span class="bx bx-star" id="favTo" title="Favorite"></span>
                     </div>
-                    
                     <div>
-                    <button type="submit" class="submit-button">Translate</button>
+                        <button type="submit" class="submit-button">Translate</button>
+                        <button type="button" class="submit-button" id="shareBtn" style="background:#007bff;margin-left:10px;">Share</button>
                     </div>
-                 
                 </div>
             </form>
-
-                
+            <div style="margin:20px 0;">
+                <h3 style="margin-bottom:5px;">History</h3>
+                <ul id="historyList" style="max-height:120px;overflow:auto;background:#f8f8f8;padding:10px;border-radius:5px;">
+                {% for item in history %}
+                    <li style="margin-bottom:5px;">
+                        <b>{{item.input}}</b> <span style="color:#888;">({{item.from}}→{{item.to}})</span> → <span>{{item.output}}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+                <h3 style="margin-bottom:5px;">Favorites</h3>
+                <ul id="favoritesList" style="max-height:120px;overflow:auto;background:#f8f8f8;padding:10px;border-radius:5px;">
+                {% for item in favorites %}
+                    <li style="margin-bottom:5px;">
+                        <b>{{item.input}}</b> <span style="color:#888;">({{item.from}}→{{item.to}})</span> → <span>{{item.output}}</span>
+                    </li>
+                {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
+    <script>
+    // Dark mode toggle
+    const darkModeBtn = document.getElementById('darkModeToggle');
+    darkModeBtn.onclick = function() {
+        document.body.classList.toggle('dark-mode');
+        if(document.body.classList.contains('dark-mode')) {
+            darkModeBtn.textContent = '☀️';
+        } else {
+            darkModeBtn.textContent = '🌙';
+        }
+    };
+
+    // Copy to clipboard functionality
+    function copyText(id, copiedId) {
+        const textarea = document.getElementById(id);
+        textarea.select();
+        textarea.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        const copied = document.getElementById(copiedId);
+        copied.style.display = 'inline';
+        setTimeout(() => copied.style.display = 'none', 1200);
+    }
+    document.getElementById('copyFrom').onclick = function() { copyText('fromText', 'copiedFrom'); };
+    document.getElementById('copyTo').onclick = function() { copyText('toText', 'copiedTo'); };
+
+    // Download translated text
+    document.getElementById('downloadTo').onclick = function() {
+        const text = document.getElementById('toText').value;
+        const blob = new Blob([text], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'translation.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    // Share translated text (Web Share API)
+    document.getElementById('shareBtn').onclick = function() {
+        const text = document.getElementById('toText').value;
+        if (navigator.share) {
+            navigator.share({text: text});
+        } else {
+            alert('Web Share not supported. Copy manually.');
+        }
+    };
+
+    // Text-to-speech for translated text
+    document.getElementById('ttsTo').onclick = function() {
+        const text = document.getElementById('toText').value;
+        const toLang = document.getElementById('toLang').value;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = toLang === 'ig' ? 'ig-NG' : 'en-US';
+        window.speechSynthesis.speak(utter);
+    };
+
+    // Speech-to-text for input
+    document.getElementById('speechFrom').onclick = function() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Speech recognition not supported in this browser.');
+            return;
+        }
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = document.getElementById('fromLang').value === 'ig' ? 'ig-NG' : 'en-US';
+        recognition.onresult = function(event) {
+            document.getElementById('fromText').value = event.results[0][0].transcript;
+            document.getElementById('fromLength').textContent = document.getElementById('fromText').value.length + '/2000';
+        };
+        recognition.start();
+    };
+
+    // Add to favorites
+    document.getElementById('favTo').onclick = function() {
+        const input = document.getElementById('fromText').value;
+        const output = document.getElementById('toText').value;
+        const from = document.getElementById('fromLang').value;
+        const to = document.getElementById('toLang').value;
+        fetch('/favorite', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `input=${encodeURIComponent(input)}&output=${encodeURIComponent(output)}&from=${from}&to=${to}`
+        }).then(r => r.json()).then(data => {
+            if(data.success) alert('Added to favorites!');
+        });
+    };
+
+    // Update code length
+    document.getElementById('fromText').addEventListener('input', function() {
+        document.getElementById('fromLength').textContent = this.value.length + '/2000';
+    });
+    document.getElementById('fromLength').textContent = document.getElementById('fromText').value.length + '/2000';
+
+    // Language switcher
+    document.getElementById('switchLangBtn').onclick = function() {
+        const from = document.getElementById('fromLang');
+        const to = document.getElementById('toLang');
+        const temp = from.value;
+        from.value = to.value;
+        to.value = temp;
+        // Optionally swap textarea values
+        const fromText = document.getElementById('fromText');
+        const toText = document.getElementById('toText');
+        const tempText = fromText.value;
+        fromText.value = toText.value;
+        toText.value = tempText;
+        document.getElementById('fromLength').textContent = fromText.value.length + '/2000';
+    };
+
+    // On form submit, set hidden fields for language direction
+    document.getElementById('translateForm').onsubmit = function() {
+        // Add hidden fields for language direction
+        let fromLang = document.getElementById('fromLang').value;
+        let toLang = document.getElementById('toLang').value;
+        let hiddenFrom = document.getElementById('hiddenFromLang');
+        let hiddenTo = document.getElementById('hiddenToLang');
+        if (!hiddenFrom) {
+            hiddenFrom = document.createElement('input');
+            hiddenFrom.type = 'hidden';
+            hiddenFrom.name = 'from_lang';
+            hiddenFrom.id = 'hiddenFromLang';
+            this.appendChild(hiddenFrom);
+        }
+        if (!hiddenTo) {
+            hiddenTo = document.createElement('input');
+            hiddenTo.type = 'hidden';
+            hiddenTo.name = 'to_lang';
+            hiddenTo.id = 'hiddenToLang';
+            this.appendChild(hiddenTo);
+        }
+        hiddenFrom.value = fromLang;
+        hiddenTo.value = toLang;
+        return true;
+    };
+    // Responsive: shrink container on small screens
+    window.addEventListener('resize', function() {
+        document.querySelector('.container').style.width = window.innerWidth < 600 ? '98%' : '900px';
+    });
+    document.querySelector('.container').style.width = window.innerWidth < 600 ? '98%' : '900px';
+    </script>
 </body>
 </html>
